@@ -1,8 +1,11 @@
+using UnityEngine;
 
 public class NormalMove : MoveLogic
 {
-    public override void Move(DirectionType dirType)
+    public override void Move(Vector2 inputDir)
     {
-        // ‚±‚±‚É‘O‚É1ƒ}ƒXˆÚ“®‚·‚éˆ—
+        (int y, int x) moveDir = (Mathf.RoundToInt(inputDir.y), Mathf.RoundToInt(inputDir.x));
+
+        _map.MapUpdate(moveDir);
     }
 }
