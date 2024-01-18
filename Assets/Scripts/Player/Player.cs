@@ -28,11 +28,11 @@ public class Player : MonoBehaviour
         _gameInputs = new();
         _gameInputs.Enable();
 
-        _gameInputs.Player.Move.started += Push;
+        _gameInputs.Player.Move.started += OnMove;
     }
 
-    private void Push(InputAction.CallbackContext context)
+    private void OnMove(InputAction.CallbackContext context)
     {
-
+        _moveLogic.Move(context.ReadValue<Vector2>());
     }
 }
