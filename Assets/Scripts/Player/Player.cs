@@ -9,6 +9,8 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
+        _moveLogic = this.GetComponent<MoveLogic>();
+
         InitInput();
     }
 
