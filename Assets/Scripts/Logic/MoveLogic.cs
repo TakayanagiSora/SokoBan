@@ -1,17 +1,22 @@
 using UnityEngine;
 
-public abstract class MoveLogic : MonoBehaviour
+public class MoveLogic : MonoBehaviour
 {
-    protected Map _map = default;
+    protected MapController _map = default;
 
     private void Awake()
     {
-        _map = FindObjectOfType<Map>();
+        _map = FindObjectOfType<MapController>();
     }
 
     /// <summary>
     /// ˆÚ“®ˆ—‚ÌÀ‘•
     /// </summary>
     /// <param name="dirType"></param>
-    public abstract void Move(Vector2 inputDir);
+    public virtual void Move(Vector2 inputDir)
+    {
+        MapIndexData moveDir = new(Mathf.RoundToInt(inputDir.x), Mathf.RoundToInt(inputDir.y));
+
+        _map.MapUpdate(moveDir);
+    }
 }
