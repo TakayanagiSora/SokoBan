@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class MapController : MonoBehaviour
 {
+    private class TileInfo
+    {
+        public GameObject _tile;
+        public Vector2 _tilePos;
+    }
+
     [SerializeField]
     private GameObject _wall = default;
     [SerializeField]
@@ -14,36 +20,15 @@ public class MapController : MonoBehaviour
     private GameObject _player = default;
 
     private MapData _mapData = new();
+    private TileInfo[,] _tiles = default;
 
     private void Awake()
     {
-        _mapData.CreateMap();
+        MapIndexData _mapSize = _mapData.CreateMap();
+
         InstancedMap();
     }
 
-    //private void DebugMap()
-    //{
-    //    string mapData = default;
-
-    //    for (int i = 0; i < _mapData.GetLength(0); i++)
-    //    {
-    //        for (int k = 0; k < _mapData.GetLength(1); k++)
-    //        {
-    //            mapData += $"{_mapData[i, k]}, ";
-    //        }
-
-    //        mapData += "\n";
-    //    }
-
-    //    mapData = mapData.Replace("None", "0");
-    //    mapData = mapData.Replace("Wall", "1");
-    //    mapData = mapData.Replace("Space", "2");
-    //    mapData = mapData.Replace("Box", "3");
-    //    mapData = mapData.Replace("Goal", "4");
-    //    mapData = mapData.Replace("Player", "5");
-
-    //    Debug.Log(mapData);
-    //}
 
     private void InstancedMap()
     {
@@ -83,5 +68,7 @@ public class MapController : MonoBehaviour
     {
         _mapData[moveDir] = TileType.Space;
         _mapData.Map[-moveDir.y, moveDir.x] = TileType.Player;
+
+        
     }
 }
