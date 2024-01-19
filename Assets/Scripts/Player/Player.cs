@@ -4,12 +4,12 @@ using UnityEngine.InputSystem;
 public class Player : MonoBehaviour
 {
     private GameInputs _gameInputs = default;
-    private MoveLogic _moveLogic = default;
+    private MapController _mapController = default;
 
 
     private void Awake()
     {
-        _moveLogic = this.GetComponent<MoveLogic>();
+        _mapController = FindObjectOfType<MapController>();
 
         InitInput();
     }
@@ -25,6 +25,9 @@ public class Player : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// InputSystemの初期化、イベント購読
+    /// </summary>
     private void InitInput()
     {
         _gameInputs = new();
@@ -35,6 +38,12 @@ public class Player : MonoBehaviour
 
     private void OnMove(InputAction.CallbackContext context)
     {
-        _moveLogic.Move(context.ReadValue<Vector2>());
+        Vector2 inputDir = context.ReadValue<Vector2>();
+
+        // コントローラー用：4方向のうち最も近い方向に補正
+        MapIndexData moveDir = new(Mathf.RoundToInt(inputDir.x), Mathf.RoundToInt(inputDir.y));
+
+        // 移動＝マップの更新
+        _mapController.MapUpdate(moveDir);
     }
 }

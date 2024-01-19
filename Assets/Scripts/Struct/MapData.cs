@@ -23,7 +23,7 @@ public struct MapData
     /// <summary>
     /// ƒ}ƒbƒv‚ğ¶¬‚·‚é
     /// </summary>
-    public void CreateMap()
+    public MapIndexData CreateMap()
     {
         const TileType _ = TileType.None;
         const TileType W = TileType.Wall;
@@ -48,5 +48,7 @@ public struct MapData
         };
 
         _playerIndex = new(7, 12);
+
+        return new(11, 17);
     }
 }
