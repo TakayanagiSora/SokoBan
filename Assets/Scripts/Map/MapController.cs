@@ -24,7 +24,8 @@ public class MapController : MonoBehaviour
 
     private void Awake()
     {
-        MapIndexData _mapSize = _mapData.CreateMap();
+        MapIndexData mapSize = _mapData.CreateMap();
+        _tiles = new TileInfo[mapSize.y, mapSize.x];
 
         InstancedMap();
     }
@@ -33,6 +34,7 @@ public class MapController : MonoBehaviour
     private void InstancedMap()
     {
         Vector2 spawnPos = new Vector2(-8f, 5f);
+        GameObject tile = default;
 
         for (int i = 0; i < _mapData.Map.GetLength(0); i++)
         {
@@ -41,21 +43,25 @@ public class MapController : MonoBehaviour
                 switch (_mapData.Map[i, k])
                 {
                     case TileType.Wall:
-                        Instantiate(_wall, spawnPos, Quaternion.identity);
+                        tile = Instantiate(_wall, spawnPos, Quaternion.identity);
                         break;
 
                     case TileType.Box:
-                        Instantiate(_box, spawnPos, Quaternion.identity);
+                        tile = Instantiate(_box, spawnPos, Quaternion.identity);
                         break;
 
                     case TileType.Goal:
-                        Instantiate(_goal, spawnPos, Quaternion.identity);
+                        tile = Instantiate(_goal, spawnPos, Quaternion.identity);
                         break;
 
                     case TileType.Player:
-                        Instantiate(_player, spawnPos, Quaternion.identity);
+                        tile = Instantiate(_player, spawnPos, Quaternion.identity);
                         break;
                 }
+
+                // タイル（GameObject）の情報を保存
+                _tiles[i, k]._tile = tile;
+                _tiles[i, k]._tilePos = spawnPos;
 
                 spawnPos = new Vector2(spawnPos.x + 1f, spawnPos.y);
             }
@@ -69,6 +75,7 @@ public class MapController : MonoBehaviour
         _mapData[moveDir] = TileType.Space;
         _mapData.Map[-moveDir.y, moveDir.x] = TileType.Player;
 
-        
+        Destroy(_tiles[moveDir.y, moveDir.x]._tile);
+        //Instantiate()
     }
 }
