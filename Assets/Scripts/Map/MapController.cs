@@ -126,9 +126,10 @@ public class MapController : MonoBehaviour
                 // Viewの更新（既オブジェクトの削除と新オブジェクトの生成）
                 // 更新情報を保持（次回以降の呼び出しの際に削除できるよう）
                 Destroy(this[boxIndex]._tile);
-                this[boxIndex + moveDir]._tile = Instantiate(_box, this[boxIndex + moveDir]._tilePos, Quaternion.identity);
-                this[boxIndex + moveDir]._tileType = TileType.Box;
 
+                this[boxIndex + moveDir]._tile = 
+                    Instantiate(_box, this[boxIndex + moveDir]._tilePos, Quaternion.identity);
+                this[boxIndex + moveDir]._tileType = TileType.Box;
                 break;
         }
 
@@ -139,11 +140,15 @@ public class MapController : MonoBehaviour
         // Viewの更新（既オブジェクトの削除と新オブジェクトの生成）
         // 更新情報を保持（次回以降の呼び出しの際に削除できるよう）
         Destroy(this[_mapData._playerIndex]._tile);
-        this[_mapData._playerIndex + moveDir]._tile = Instantiate(_player, this[_mapData._playerIndex + moveDir]._tilePos, Quaternion.identity);
+
+        this[_mapData._playerIndex + moveDir]._tile = 
+            Instantiate(_player, this[_mapData._playerIndex + moveDir]._tilePos, Quaternion.identity);
         this[_mapData._playerIndex + moveDir]._tileType = TileType.Player;
 
         // プレイヤーの位置を更新
         _mapData._playerIndex += moveDir;
+
+        GoalCheck(_mapData._playerIndex + moveDir);
     }
 
     /// <summary>
@@ -151,18 +156,18 @@ public class MapController : MonoBehaviour
     /// </summary>
     public void GoalCheck(MapIndexData boxMovedIndex)
     {
+        print("A");
         // ゴールじゃなければ弾く
         if (_mapData[boxMovedIndex] != TileType.Goal) { return; }
 
         _nowGoalAmount++;
-
+        print("B");
         if (_mapData.GoalAmount <= _nowGoalAmount)
         {
             // クリア
             this[boxMovedIndex]._tile.GetComponent<Goal>().OnGoal();
+            print("Clear!");
         }
-
-
     }
 
     //private void DebugMap()
