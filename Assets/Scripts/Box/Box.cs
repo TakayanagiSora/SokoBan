@@ -1,11 +1,6 @@
 using UnityEngine;
 
-public class Box : MonoBehaviour, IPushable
+public class Box : MonoBehaviour
 {
-    
 
-    public void Pushed()
-    {
-        
-    }
 }
