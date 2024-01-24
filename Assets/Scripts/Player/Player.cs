@@ -33,7 +33,7 @@ public class Player : MonoBehaviour
         _gameInputs = new();
         _gameInputs.Enable();
 
-        _gameInputs.Player.Move.started += OnMove;
+        _gameInputs.Player.Move.performed += OnMove;
     }
 
     private void OnMove(InputAction.CallbackContext context)
@@ -41,7 +41,7 @@ public class Player : MonoBehaviour
         Vector2 inputDir = context.ReadValue<Vector2>();
 
         // コントローラー用：4方向のうち最も近い方向に補正
-        MapIndexData moveDir = new(Mathf.RoundToInt(inputDir.x), Mathf.RoundToInt(inputDir.y));
+        MapIndexData moveDir = new(Mathf.RoundToInt(inputDir.y), Mathf.RoundToInt(inputDir.x));
 
         // 移動＝マップの更新
         _mapController.MapUpdate(moveDir);

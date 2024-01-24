@@ -4,10 +4,10 @@ public struct MapIndexData
     public int x;
     public int y;
 
-    public MapIndexData(int x, int y)
+    public MapIndexData(int y, int x)
     {
-        this.x = x;
         this.y = y;
+        this.x = x;
     }
 
     public static MapIndexData operator +(MapIndexData left, MapIndexData right)
@@ -21,8 +21,8 @@ public struct MapIndexData
     public static MapIndexData operator -(MapIndexData left, MapIndexData right)
     {
         MapIndexData mapIndexData = default;
-        mapIndexData.x = left.x - right.x;
-        mapIndexData.y = left.y - right.y;
+        mapIndexData.x = left.x + right.x;
+        mapIndexData.y = left.y + right.y;
         return mapIndexData;
     }
 

@@ -4,8 +4,10 @@ public struct MapData
     private TileType[,] _map;
     public MapIndexData _playerIndex;
 
+    public int GoalAmount { get; private set; }
 
     public TileType[,] Map => _map;
+
 
     public TileType this[MapIndexData mapIndexData]
     {
@@ -47,6 +49,7 @@ public struct MapData
             {_, _, _, _, W, W, W, W, W, W, W, W, _, _, _, _, _ },
         };
 
+        GoalAmount = 6;
         _playerIndex = new(7, 12);
 
         return new(11, 17);
