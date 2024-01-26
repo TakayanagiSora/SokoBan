@@ -22,7 +22,6 @@ public class MapController : MonoBehaviour
 
     private MapData _mapData = new();
     private TileInfo[,] _tiles = default;
-    private int _nowGoalAmount = default;
 
     public TileInfo this[MapIndexData mapIndexData]
     {
@@ -102,95 +101,112 @@ public class MapController : MonoBehaviour
         // 移動方向を配列の操作方向に変換（yだけ反転）
         moveDir.y = moveDir.y * -1;
 
-        // 移動先のタイルによって処理を弾く
-        switch (this[_mapData._playerIndex + moveDir]._tileType)
+        TileType moveDirTile = this[_mapData._playerIndex + moveDir]._tileType;
+
+        // 移動先のタイルによって処理をわける
+        if (moveDirTile == TileType.Wall)
         {
-            // 移動できない
-            case TileType.None:
-                return;
+            return;
+        }
+        else if (moveDirTile == TileType.Box || moveDirTile == TileType.BoxOnGoal)
+        {
+            // マップデータ（二次元配列）を更新
+            MapIndexData boxIndex = _mapData._playerIndex + moveDir;
 
-            // 移動できない
-            case TileType.Wall:
-                return;
+            // Boxを押した先が壁もしくはBoxなら弾く
+            if (this[boxIndex + moveDir]._tileType == TileType.Wall || this[boxIndex + moveDir]._tileType == TileType.Box || this[boxIndex + moveDir]._tileType == TileType.BoxOnGoal) { return; }
 
-            // Boxも移動させる
-            case TileType.Box:
-                // マップデータ（二次元配列）を更新
-                MapIndexData boxIndex = _mapData._playerIndex + moveDir;
-
-                // Boxを押した先が壁もしくはBoxなら弾く
-                if (_mapData[boxIndex + moveDir] == TileType.Wall || _mapData[boxIndex + moveDir] == TileType.Box) { return; }
-
+            // ゴールかどうか判定
+            if (this[boxIndex + moveDir]._tileType == TileType.Goal)
+            {
+                this[boxIndex + moveDir]._tileType = TileType.BoxOnGoal;
+                Goal(boxIndex + moveDir);
+            }
+            else
+            {
                 _mapData[boxIndex + moveDir] = TileType.Box;
-
-                // Viewの更新（既オブジェクトの削除と新オブジェクトの生成）
-                // 更新情報を保持（次回以降の呼び出しの際に削除できるよう）
-                Destroy(this[boxIndex]._tile);
-
-                this[boxIndex + moveDir]._tile = 
-                    Instantiate(_box, this[boxIndex + moveDir]._tilePos, Quaternion.identity);
                 this[boxIndex + moveDir]._tileType = TileType.Box;
-                break;
+            }
+
+            // Viewの更新（既オブジェクトの削除と新オブジェクトの生成）
+            // 更新情報を保持（次回以降の呼び出しの際に削除できるよう）
+            Destroy(this[boxIndex]._tile);
+
+            this[boxIndex + moveDir]._tile =
+                Instantiate(_box, this[boxIndex + moveDir]._tilePos, Quaternion.identity);
         }
 
-        // マップデータ（二次元配列）を更新
-        _mapData[_mapData._playerIndex] = TileType.Space;
-        _mapData[moveDir + _mapData._playerIndex] = TileType.Player;
+        if (_mapData[_mapData._playerIndex] == TileType.Goal)
+        {
+            // マップデータ（二次元配列）を更新
+            this[_mapData._playerIndex]._tileType = TileType.Goal;
+        }
+        else
+        {
+            this[_mapData._playerIndex]._tileType = TileType.Space;
+        }
+
+        this[moveDir + _mapData._playerIndex]._tileType = TileType.Player;
 
         // Viewの更新（既オブジェクトの削除と新オブジェクトの生成）
         // 更新情報を保持（次回以降の呼び出しの際に削除できるよう）
         Destroy(this[_mapData._playerIndex]._tile);
 
-        this[_mapData._playerIndex + moveDir]._tile = 
+        this[_mapData._playerIndex + moveDir]._tile =
             Instantiate(_player, this[_mapData._playerIndex + moveDir]._tilePos, Quaternion.identity);
         this[_mapData._playerIndex + moveDir]._tileType = TileType.Player;
 
         // プレイヤーの位置を更新
         _mapData._playerIndex += moveDir;
-
-        GoalCheck(_mapData._playerIndex + moveDir);
     }
 
     /// <summary>
-    /// ゴールしたかどうかチェックする
+    /// ゴール時の処理
     /// </summary>
-    public void GoalCheck(MapIndexData boxMovedIndex)
+    public void Goal(MapIndexData boxMovedIndex)
     {
-        print("A");
-        // ゴールじゃなければ弾く
-        if (_mapData[boxMovedIndex] != TileType.Goal) { return; }
+        int nowGoalAmount = 0;
 
-        _nowGoalAmount++;
-        print("B");
-        if (_mapData.GoalAmount <= _nowGoalAmount)
+        for (int i = 0; i < _mapData.Map.GetLength(0); i++)
+        {
+            for (int k = 0; k < _mapData.Map.GetLength(1); k++)
+            {
+                if (_tiles[i, k]._tileType == TileType.BoxOnGoal)
+                {
+                    nowGoalAmount++;
+                }
+            }
+        }
+
+        if (_mapData.GoalAmount <= nowGoalAmount)
         {
             // クリア
-            this[boxMovedIndex]._tile.GetComponent<Goal>().OnGoal();
             print("Clear!");
         }
     }
 
-    //private void DebugMap()
-    //{
-    //    string mapData = default;
+    private void DebugMap()
+    {
+        string mapData = default;
 
-    //    for (int i = 0; i < _mapData.Map.GetLength(0); i++)
-    //    {
-    //        for (int k = 0; k < _mapData.Map.GetLength(1); k++)
-    //        {
-    //            mapData += $"{_mapData.Map[i, k]}, ";
-    //        }
+        for (int i = 0; i < _mapData.Map.GetLength(0); i++)
+        {
+            for (int k = 0; k < _mapData.Map.GetLength(1); k++)
+            {
+                mapData += $"{_tiles[i, k]._tileType}, ";
+            }
 
-    //        mapData += "\n";
-    //    }
+            mapData += "\n";
+        }
 
-    //    mapData = mapData.Replace("None", "_");
-    //    mapData = mapData.Replace("Wall", "W");
-    //    mapData = mapData.Replace("Space", "S");
-    //    mapData = mapData.Replace("Box", "B");
-    //    mapData = mapData.Replace("Goal", "G");
-    //    mapData = mapData.Replace("Player", "P");
+        mapData = mapData.Replace("None", "_");
+        mapData = mapData.Replace("Wall", "W");
+        mapData = mapData.Replace("Space", "S");
+        mapData = mapData.Replace("Box", "B");
+        mapData = mapData.Replace("Goal", "G");
+        mapData = mapData.Replace("Player", "P");
+        mapData = mapData.Replace("BOnG", "@");
 
-    //    Debug.Log(mapData);
-    //}
+        Debug.Log(mapData);
+    }
 }
