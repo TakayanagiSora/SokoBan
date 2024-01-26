@@ -13,4 +13,8 @@ public enum TileType
     Box,
     Goal,
     Player,
+    /// <summary>
+    /// ÉSÅ[ÉãÇµÇΩBox
+    /// </summary>
+    BoxOnGoal
 }
