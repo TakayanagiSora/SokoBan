@@ -1,6 +1,7 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UniRx;
+using System;
 
 public class MapController : MonoBehaviour
 {
@@ -22,6 +23,12 @@ public class MapController : MonoBehaviour
 
     private MapData _mapData = new();
     private TileInfo[,] _tiles = default;
+    private float _createWaitTime = 0.08f;
+    private bool _isFinishCreate = false;
+
+    private Subject<Unit> _onClear = new();
+
+    public IObservable<Unit> OnClear => _onClear;
 
     public TileInfo this[MapIndexData mapIndexData]
     {
@@ -40,38 +47,48 @@ public class MapController : MonoBehaviour
         MapIndexData mapSize = _mapData.CreateMap();
         _tiles = new TileInfo[mapSize.y, mapSize.x];
 
-        InstancedMap();
+        StartCoroutine(InstancedMap());
     }
 
 
     /// <summary>
     /// マップをViewに表示する
     /// </summary>
-    private void InstancedMap()
+    private IEnumerator InstancedMap()
     {
         Vector2 spawnPos = new(-8f, 5f);
         GameObject tile;
 
         for (int i = 0; i < _mapData.Map.GetLength(0); i++)
         {
+            WaitForSeconds createWait = new(_createWaitTime);
+
             for (int k = 0; k < _mapData.Map.GetLength(1); k++)
             {
                 switch (_mapData.Map[i, k])
                 {
                     case TileType.Wall:
                         tile = Instantiate(_wall, spawnPos, Quaternion.identity);
+
+                        yield return createWait;
                         break;
 
                     case TileType.Box:
                         tile = Instantiate(_box, spawnPos, Quaternion.identity);
+
+                        yield return createWait;
                         break;
 
                     case TileType.Goal:
                         tile = Instantiate(_goal, spawnPos, Quaternion.identity);
+
+                        yield return createWait;
                         break;
 
                     case TileType.Player:
                         tile = Instantiate(_player, spawnPos, Quaternion.identity);
+
+                        yield return createWait;
                         break;
 
                     default:
@@ -88,8 +105,14 @@ public class MapController : MonoBehaviour
                 spawnPos = new Vector2(spawnPos.x + 1f, spawnPos.y);
             }
 
+            // だんだん生成間の待機時間を短くする
+            _createWaitTime *= 0.85f;
             spawnPos = new Vector2(-8f, spawnPos.y - 1f);
         }
+
+        _isFinishCreate = true;
+        _onClear.OnNext(Unit.Default);
+
     }
 
     /// <summary>
@@ -98,6 +121,9 @@ public class MapController : MonoBehaviour
     /// <param name="moveDir"></param>
     public void MapUpdate(MapIndexData moveDir)
     {
+        // マップの生成が完了するまで弾く
+        if (!_isFinishCreate) { return; }
+
         // 移動方向を配列の操作方向に変換（yだけ反転）
         moveDir.y = moveDir.y * -1;
 
@@ -182,6 +208,7 @@ public class MapController : MonoBehaviour
         {
             // クリア
             print("Clear!");
+            _onClear.OnNext(Unit.Default);
         }
     }
 
