@@ -111,8 +111,6 @@ public class MapController : MonoBehaviour
         }
 
         _isFinishCreate = true;
-        _onClear.OnNext(Unit.Default);
-
     }
 
     /// <summary>

@@ -31,6 +31,7 @@ public class SceneController : MonoBehaviour
     {
         if (SceneManager.GetActiveScene().name == TITLE_NAME)
         {
+            _isClear = false;
             SceneManager.LoadScene(MAIN_NAME);
         }
         else if (SceneManager.GetActiveScene().name == MAIN_NAME && _isClear)
