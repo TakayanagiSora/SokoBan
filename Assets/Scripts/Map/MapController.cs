@@ -25,6 +25,10 @@ public class MapController : MonoBehaviour
     private TileInfo[,] _tiles = default;
     private float _createWaitTime = 0.08f;
     private bool _isFinishCreate = false;
+    private Coroutine _timeCountCoroutine = default;
+
+    public int NumberOfMoves { get; private set; } = 0;
+    public float PlayTime { get; private set; } = 0f;
 
     private Subject<Unit> _onClear = new();
 
@@ -111,6 +115,7 @@ public class MapController : MonoBehaviour
         }
 
         _isFinishCreate = true;
+        _timeCountCoroutine = StartCoroutine(TimeCountAsync());
     }
 
     /// <summary>
@@ -144,7 +149,7 @@ public class MapController : MonoBehaviour
             if (this[boxIndex + moveDir]._tileType == TileType.Goal)
             {
                 this[boxIndex + moveDir]._tileType = TileType.BoxOnGoal;
-                Goal(boxIndex + moveDir);
+                Goal();
             }
             else
             {
@@ -158,6 +163,9 @@ public class MapController : MonoBehaviour
 
             this[boxIndex + moveDir]._tile =
                 Instantiate(_box, this[boxIndex + moveDir]._tilePos, Quaternion.identity);
+
+            // 手数データのカウント
+            NumberOfMoves++;
         }
 
         if (_mapData[_mapData._playerIndex] == TileType.Goal)
@@ -187,7 +195,7 @@ public class MapController : MonoBehaviour
     /// <summary>
     /// ゴール時の処理
     /// </summary>
-    public void Goal(MapIndexData boxMovedIndex)
+    public void Goal()
     {
         int nowGoalAmount = 0;
 
@@ -204,9 +212,18 @@ public class MapController : MonoBehaviour
 
         if (_mapData.GoalAmount <= nowGoalAmount)
         {
+            StopCoroutine(_timeCountCoroutine);
             // クリア
-            print("Clear!");
             _onClear.OnNext(Unit.Default);
+        }
+    }
+
+    private IEnumerator TimeCountAsync()
+    {
+        while (true)
+        {
+            PlayTime += Time.deltaTime;
+            yield return null;
         }
     }
 
