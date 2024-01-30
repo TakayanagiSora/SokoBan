@@ -44,8 +44,14 @@ public class SceneController : MonoBehaviour
     private void OnExit(InputAction.CallbackContext context)
     {
 #if !UNITY_EDITOR
-      
+      if (SceneManager.GetActiveScene().name == TITLE_NAME)
+      {
         Application.Quit();
+      }
+      else
+      {
+        SceneManager.LoadScene(TITLE_NAME);
+      }
 #endif
     }
 
