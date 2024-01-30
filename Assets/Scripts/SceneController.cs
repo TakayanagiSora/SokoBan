@@ -17,6 +17,7 @@ public class SceneController : MonoBehaviour
         _gameInputs = new();
         _gameInputs.Enable();
         _gameInputs.Player.Submit.performed += OnSubmit;
+        _gameInputs.Player.Exit.performed += OnExit;
 
         SceneManager.sceneLoaded += ReadMainSceneInfo;
         DontDestroyOnLoad(this.gameObject);
@@ -38,6 +39,14 @@ public class SceneController : MonoBehaviour
         {
             SceneManager.LoadScene(TITLE_NAME);
         }
+    }
+
+    private void OnExit(InputAction.CallbackContext context)
+    {
+#if !UNITY_EDITOR
+      
+        Application.Quit();
+#endif
     }
 
     private void ReadMainSceneInfo(Scene nextScene, LoadSceneMode mode)
