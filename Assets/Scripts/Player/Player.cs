@@ -33,7 +33,7 @@ public class Player : MonoBehaviour
         _gameInputs = new();
         _gameInputs.Enable();
 
-        _gameInputs.Player.Move.performed += OnMove;
+        _gameInputs.Player.Move.started += OnMove;
     }
 
     private void OnMove(InputAction.CallbackContext context)

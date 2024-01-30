@@ -19,11 +19,6 @@ public class GameManager : MonoBehaviour
         _retryImage.color = new(_retryImage.color.r, _retryImage.color.g, _retryImage.color.b, 0f);
     }
 
-    private void GameStart()
-    {
-
-    }
-
     private void GameClear()
     {
         _clearImage.color = new(_clearImage.color.r, _clearImage.color.g, _clearImage.color.b, 1f);
